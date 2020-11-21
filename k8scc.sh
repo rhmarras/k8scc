@@ -35,24 +35,23 @@ function usage()
 
 function example()
 { 
-echo -e "Remember you need to get the root certificate and key from your Kubernetes clusters. For kubeadm/kubespray, you can copy it from any master node, as it’s located in the /etc/kubernetes/ssl directory. For Kops, it’s in the S3 bucket configured at install time. The S3 paths are: \n \n ca.crt: s3://state-store/<cluster-name>/pki/issued/ca/<id>.crt \n ca.key: s3://state-store/<cluster-name>/pki/private/ca/<id>.key \n \n Put them in the CA folder and name them ca.crt and ca.key."
-echo "\
-echo 
-This is an example of a Role configuration yaml file for k8s....\
-\
-kind: Role\
-apiVersion: rbac.authorization.k8s.io/v1\
-metadata:\
-  namespace: smithns\
-  name: smithns-rw-role\
-rules:\
-- apiGroups: ["", "batch", "extensions", "apps"]\
-  resources: ["*"]\
-  verbs: ["*"]\
-\
-\
-This is an example of a Role binding configuration yaml file for k8s...\
-\
+echo -e "Remember you need to get the root certificate and key from your Kubernetes clusters. For kubeadm/kubespray, you can copy it from any master node, as it’s located in the /etc/kubernetes/ssl directory. For Kops, it’s in the S3 bucket configured at install time. The S3 paths are: \n \n ca.crt: s3://state-store/<cluster-name>/pki/issued/ca/<id>.crt \n ca.key: s3://state-store/<cluster-name>/pki/private/ca/<id>.key \n \n Put them in the CA folder and name them ca.crt and ca.key.
+
+This is an example of a Role configuration yaml file for k8s....
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: smithns
+  name: smithns-rw-role
+rules:
+- apiGroups: [\"\", \"batch\", \"extensions\", \"apps\"]
+  resources: [\"*\"]
+  verbs: [\"*\"]
+
+
+This is an example of a Role binding configuration yaml file for k8s...
+
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -61,37 +60,36 @@ metadata:
 subjects:
 - kind: User
   name: smith
-  apiGroup: ""
+  apiGroup: \"\"
 roleRef:
   kind: Role
   name: smithns-rw-role
   apiGroup: rbac.authorization.k8s.io
-\
-\
-you would apply them with:\
-kubectl apply -f filename.yaml\ 
-\ 
-\
-If you want to delete the authorization, just delete de role/rolebinding from the cluster and your user will lose access\
-\
+
+you would apply them with:
+kubectl apply -f filename.yaml
+
+
+If you want to delete the authorization, just delete de role/rolebinding from the cluster and your user will lose access
+
 Cheers!"
 }
 
 function license() {
-  echo "    <k8scc.sh - automates the process of creating user certs for k8s RBAC configuration.>\
-    Copyright (C) 2020  Rodrigo H. Marras - marras.com.ar\
-\
-    This program is free software: you can redistribute it and/or modify\
-    it under the terms of the GNU General Public License as published by\
-    the Free Software Foundation, either version 3 of the License, or\
-    (at your option) any later version.\
-\
-    This program is distributed in the hope that it will be useful,\
-    but WITHOUT ANY WARRANTY; without even the implied warranty of\
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\
-    GNU General Public License for more details.\
-\
-    You should have received a copy of the GNU General Public License\
+  echo "    <k8scc.sh - automates the process of creating user certs for k8s RBAC configuration.>
+    Copyright (C) 2020  Rodrigo H. Marras - marras.com.ar
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>."
 }
 while [ "$1" != "" ]; do
@@ -167,24 +165,24 @@ CA_CRT_BASE64=$(base64 CA/ca.crt)
 CLIENT_CRT_BASE64=$(base64 OUT/${USER_NAME}.crt)
 CLIENT_KEY_BASE64=$(base64 OUT/${USER_NAME}.key)
 
-echo "apiVersion: v1\
-current-context: ${USER_NAME}-ctx\
-preferences: {}\
-clusters:\
-- cluster:\
-    certificate-authority-data: ${CA_CRT_BASE64}\
-    server: ${K8S_API_URL}\
-  name: ${CLUSTER_NAME}\
-contexts:\
-- context:\
-    cluster: ${CLUSTER_NAME}\
-    user: ${USER_NAME}\
-  name: ${USER_NAME}-ctx\
-kind: Config\
-users:\
-- name: ${USER_NAME}\
-  user:\
-    client-certificate-data: ${CLIENT_CRT_BASE64}\
+echo "apiVersion: v1
+current-context: ${USER_NAME}-ctx
+preferences: {}
+clusters:
+- cluster:
+    certificate-authority-data: ${CA_CRT_BASE64}
+    server: ${K8S_API_URL}
+  name: ${CLUSTER_NAME}
+contexts:
+- context:
+    cluster: ${CLUSTER_NAME}
+    user: ${USER_NAME}
+  name: ${USER_NAME}-ctx
+kind: Config
+users:
+- name: ${USER_NAME}
+  user:
+    client-certificate-data: ${CLIENT_CRT_BASE64}
     client-key-data: ${CLIENT_KEY_BASE64}" > OUT/config.${USER_NAME}
 
 echo "OUT/config.${USER_NAME} file created - please deliver it to your user IN A SECURE WAY - make sure you configured your role and role-binding properly in your k8s cluster"
