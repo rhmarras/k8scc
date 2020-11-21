@@ -118,7 +118,7 @@ while [ "$1" != "" ]; do
             DAYS="$VALUE"
             ;;
         --version)
-            echo -e "k8scc.sh version ${VER} - GPLv3 - Author: Rodrigo H. Marras\nProgrammed with love \xf0\x9f\x94\x86""; exit 0
+            echo -e "k8scc.sh version ${VER} - GPLv3 - Author: Rodrigo H. Marras\nProgrammed with love \xf0\x9f\x94\x86"; exit 0
             ;;
         --example)
             example; exit 0
