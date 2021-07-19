@@ -1,5 +1,6 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
+#set -x
 
 VER="v1.0.0"
 
@@ -151,19 +152,19 @@ FILE_NAME=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW
 echo "Using ${FILE_NAME} for the output files"
 
 echo "First, we need to generate a private key for our new user:"
-openssl genrsa -out ${FILE_NAME}.key 2048
+openssl genrsa -out OUT/${FILE_NAME}.key 2048
 
 echo "Next, we create a CSR using the key we just generated"
-openssl req -new -key ${FILE_NAME}.key -out ${FILE_NAME}.csr -subj "/CN=${USER_NAME}/O=${GROUP_NAME}"
+openssl req -new -key OUT/${FILE_NAME}.key -out OUT/${FILE_NAME}.csr -subj "/CN=${USER_NAME}/O=${GROUP_NAME}"
 
 echo "Now we create a certificate using our private key, our CSR, and our CA for signing."
 
-openssl x509 -req -in ${FILE_NAME}.csr -CA CA/ca.crt -CAkey CA/ca.key -CAcreateserial -out OUT/${FILE_NAME}.crt -days ${DAYS}
+openssl x509 -req -in OUT/${FILE_NAME}.csr -CA CA/ca.crt -CAkey CA/ca.key -CAcreateserial -out OUT/${FILE_NAME}.crt -days ${DAYS}
 
 
-CA_CRT_BASE64=$(base64 CA/ca.crt)
-CLIENT_CRT_BASE64=$(base64 OUT/${USER_NAME}.crt)
-CLIENT_KEY_BASE64=$(base64 OUT/${USER_NAME}.key)
+CA_CRT_BASE64=$(base64 -w0 CA/ca.crt)
+CLIENT_CRT_BASE64=$(base64 -w0 OUT/${USER_NAME}.crt)
+CLIENT_KEY_BASE64=$(base64 -w0 OUT/${USER_NAME}.key)
 
 echo "apiVersion: v1
 current-context: ${USER_NAME}-ctx
