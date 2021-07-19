@@ -28,6 +28,7 @@ function usage()
     echo -e "or check out other non-mandatory options:"
     echo -e ""
     echo -e "\t--example   <--- print a usage example"
+#    echo -e "\t--kops      <--- will fetch ca.crt and ca.key from your s3 kops store and put it in CA folder"
     echo -e "\t--license   <--- print this programs's license"
     echo -e "\t--version   <--- print this programs's version"
     echo -e "Make sure you have the ca.crt and ca.key files from your K8s cluster in the CA directory."
@@ -36,42 +37,10 @@ function usage()
 
 function example()
 { 
-echo -e "Remember you need to get the root certificate and key from your Kubernetes clusters. For kubeadm/kubespray, you can copy it from any master node, as it’s located in the /etc/kubernetes/ssl directory. For Kops, it’s in the S3 bucket configured at install time. The S3 paths are: \n \n ca.crt: s3://state-store/<cluster-name>/pki/issued/ca/<id>.crt \n ca.key: s3://state-store/<cluster-name>/pki/private/ca/<id>.key \n \n Put them in the CA folder and name them ca.crt and ca.key.
-
-This is an example of a Role configuration yaml file for k8s....
-
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  namespace: smithns
-  name: smithns-rw-role
-rules:
-- apiGroups: [\"\", \"batch\", \"extensions\", \"apps\"]
-  resources: [\"*\"]
-  verbs: [\"*\"]
-
-
-This is an example of a Role binding configuration yaml file for k8s...
-
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: smithrolebinding
-  namespace: smithns
-subjects:
-- kind: User
-  name: smith
-  apiGroup: \"\"
-roleRef:
-  kind: Role
-  name: smithns-rw-role
-  apiGroup: rbac.authorization.k8s.io
-
-you would apply them with:
-kubectl apply -f filename.yaml
-
-
-If you want to delete the authorization, just delete de role/rolebinding from the cluster and your user will lose access
+echo -e "Remember you need to get the root certificate and key from your Kubernetes clusters. For kubeadm/kubespray, you can copy it from any master node, \
+as it’s located in the /etc/kubernetes/ssl directory. For Kops, it’s in the S3 bucket configured at install time. \
+The S3 paths are: \n \n ca.crt: s3://state-store/<cluster-name>/pki/issued/ca/<id>.crt \n \
+ca.key: s3://state-store/<cluster-name>/pki/private/ca/<id>.key \n \n Put them in the CA folder and name them ca.crt and ca.key.
 
 Cheers!"
 }
@@ -122,6 +91,9 @@ while [ "$1" != "" ]; do
         --example)
             example; exit 0
             ;;
+#        --kops)
+#            fetch
+#            ;;
         --license)
             license; exit 0
             ;;
